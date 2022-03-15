@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="c19d303dbc1b449d86c0a094b0728fb5" Name="Diagram1">
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.assets" Width="1.5" PointX="5.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.mainCategory" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.occupations" Width="1.5" PointX="0.75" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.operations" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.roles" Width="1.5" PointX="0.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.subCategory" Width="1.5" PointX="5.25" PointY="1.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.users" Width="1.5" PointX="3" PointY="4.375" IsExpanded="true" />
+        <AssociationConnector Association="Karbantarto01_DBModel.FK_MAINCATEGORY" ManuallyRouted="false" />
+        <AssociationConnector Association="Karbantarto01_DBModel.FK_MAINCATEGORYROLE" ManuallyRouted="false" />
+        <AssociationConnector Association="Karbantarto01_DBModel.FK_OccupationId" ManuallyRouted="false" />
+        <AssociationConnector Association="Karbantarto01_DBModel.FK_SUBCATEGORYOCCUPATION" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

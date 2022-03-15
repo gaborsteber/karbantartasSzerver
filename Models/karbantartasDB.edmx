@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Karbantarto01_DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="assets">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="location" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="assetsMainCategory" Type="int" Nullable="false" />
+          <Property Name="assetsSubCategory" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="mainCategory">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="mainCategoryName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="mainCategoryWorkMinutes" Type="int" Nullable="false" />
+          <Property Name="mainCategoryOccupation" Type="int" Nullable="false" />
+          <Property Name="mainCategoryOpId" Type="int" />
+        </EntityType>
+        <EntityType Name="occupations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="occupationName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="occupationDescrition" Type="text" />
+        </EntityType>
+        <EntityType Name="operations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="opId" Type="int" Nullable="false" />
+          <Property Name="opName" Type="varchar" MaxLength="50" />
+          <Property Name="opWorkMinutes" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="roleName" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="subCategory">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="subCategoryName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="subCategoryLevel" Type="int" Nullable="false" />
+          <Property Name="subMainId" Type="int" Nullable="false" />
+          <Property Name="subCategoryWorkMinutes" Type="int" />
+          <Property Name="subCategoryOccupation" Type="int" Nullable="false" />
+          <Property Name="subCategoryOpId" Type="int" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="fullName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="roleId" Type="int" Nullable="false" />
+          <Property Name="occupationId" Type="int" />
+          <Property Name="token" Type="varchar" MaxLength="50" />
+          <Property Name="password" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_MAINCATEGORY">
+          <End Role="mainCategory" Type="Self.mainCategory" Multiplicity="1" />
+          <End Role="subCategory" Type="Self.subCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="mainCategory">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="subCategory">
+              <PropertyRef Name="subMainId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MAINCATEGORYROLE">
+          <End Role="occupations" Type="Self.occupations" Multiplicity="1" />
+          <End Role="mainCategory" Type="Self.mainCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="occupations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mainCategory">
+              <PropertyRef Name="mainCategoryOccupation" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OccupationId">
+          <End Role="occupations" Type="Self.occupations" Multiplicity="0..1" />
+          <End Role="users" Type="Self.users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="occupations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="users">
+              <PropertyRef Name="occupationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SUBCATEGORYOCCUPATION">
+          <End Role="occupations" Type="Self.occupations" Multiplicity="1" />
+          <End Role="subCategory" Type="Self.subCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="occupations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="subCategory">
+              <PropertyRef Name="subCategoryOccupation" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Karbantarto01_DBModelStoreContainer">
+          <EntitySet Name="assets" EntityType="Self.assets" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="mainCategory" EntityType="Self.mainCategory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="occupations" EntityType="Self.occupations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="operations" EntityType="Self.operations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="roles" EntityType="Self.roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="subCategory" EntityType="Self.subCategory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="users" EntityType="Self.users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_MAINCATEGORY" Association="Self.FK_MAINCATEGORY">
+            <End Role="mainCategory" EntitySet="mainCategory" />
+            <End Role="subCategory" EntitySet="subCategory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MAINCATEGORYROLE" Association="Self.FK_MAINCATEGORYROLE">
+            <End Role="occupations" EntitySet="occupations" />
+            <End Role="mainCategory" EntitySet="mainCategory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OccupationId" Association="Self.FK_OccupationId">
+            <End Role="occupations" EntitySet="occupations" />
+            <End Role="users" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SUBCATEGORYOCCUPATION" Association="Self.FK_SUBCATEGORYOCCUPATION">
+            <End Role="occupations" EntitySet="occupations" />
+            <End Role="subCategory" EntitySet="subCategory" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Karbantarto01_DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="assets">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="location" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="assetsMainCategory" Type="Int32" Nullable="false" />
+          <Property Name="assetsSubCategory" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="mainCategory">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="mainCategoryName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="mainCategoryWorkMinutes" Type="Int32" Nullable="false" />
+          <Property Name="mainCategoryOccupation" Type="Int32" Nullable="false" />
+          <Property Name="mainCategoryOpId" Type="Int32" />
+          <NavigationProperty Name="subCategory" Relationship="Self.FK_MAINCATEGORY" FromRole="mainCategory" ToRole="subCategory" />
+          <NavigationProperty Name="occupations" Relationship="Self.FK_MAINCATEGORYROLE" FromRole="mainCategory" ToRole="occupations" />
+        </EntityType>
+        <EntityType Name="occupations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="occupationName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="occupationDescrition" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="mainCategory" Relationship="Self.FK_MAINCATEGORYROLE" FromRole="occupations" ToRole="mainCategory" />
+          <NavigationProperty Name="users" Relationship="Self.FK_OccupationId" FromRole="occupations" ToRole="users" />
+          <NavigationProperty Name="subCategory" Relationship="Self.FK_SUBCATEGORYOCCUPATION" FromRole="occupations" ToRole="subCategory" />
+        </EntityType>
+        <EntityType Name="operations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="opId" Type="Int32" Nullable="false" />
+          <Property Name="opName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="opWorkMinutes" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="roleName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityType Name="subCategory">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="subCategoryName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="subCategoryLevel" Type="Int32" Nullable="false" />
+          <Property Name="subMainId" Type="Int32" Nullable="false" />
+          <Property Name="subCategoryWorkMinutes" Type="Int32" />
+          <Property Name="subCategoryOccupation" Type="Int32" Nullable="false" />
+          <Property Name="subCategoryOpId" Type="Int32" />
+          <NavigationProperty Name="mainCategory" Relationship="Self.FK_MAINCATEGORY" FromRole="subCategory" ToRole="mainCategory" />
+          <NavigationProperty Name="occupations" Relationship="Self.FK_SUBCATEGORYOCCUPATION" FromRole="subCategory" ToRole="occupations" />
+        </EntityType>
+        <EntityType Name="users">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="fullName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="roleId" Type="Int32" Nullable="false" />
+          <Property Name="occupationId" Type="Int32" />
+          <Property Name="token" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="occupations" Relationship="Self.FK_OccupationId" FromRole="users" ToRole="occupations" />
+        </EntityType>
+        <Association Name="FK_MAINCATEGORY">
+          <End Role="mainCategory" Type="Self.mainCategory" Multiplicity="1" />
+          <End Role="subCategory" Type="Self.subCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="mainCategory">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="subCategory">
+              <PropertyRef Name="subMainId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MAINCATEGORYROLE">
+          <End Role="occupations" Type="Self.occupations" Multiplicity="1" />
+          <End Role="mainCategory" Type="Self.mainCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="occupations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="mainCategory">
+              <PropertyRef Name="mainCategoryOccupation" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_OccupationId">
+          <End Role="occupations" Type="Self.occupations" Multiplicity="0..1" />
+          <End Role="users" Type="Self.users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="occupations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="users">
+              <PropertyRef Name="occupationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SUBCATEGORYOCCUPATION">
+          <End Role="occupations" Type="Self.occupations" Multiplicity="1" />
+          <End Role="subCategory" Type="Self.subCategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="occupations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="subCategory">
+              <PropertyRef Name="subCategoryOccupation" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Karbantarto01_DBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="assets" EntityType="Self.assets" />
+          <EntitySet Name="mainCategory" EntityType="Self.mainCategory" />
+          <EntitySet Name="occupations" EntityType="Self.occupations" />
+          <EntitySet Name="operations" EntityType="Self.operations" />
+          <EntitySet Name="roles" EntityType="Self.roles" />
+          <EntitySet Name="subCategory" EntityType="Self.subCategory" />
+          <EntitySet Name="users" EntityType="Self.users" />
+          <AssociationSet Name="FK_MAINCATEGORY" Association="Self.FK_MAINCATEGORY">
+            <End Role="mainCategory" EntitySet="mainCategory" />
+            <End Role="subCategory" EntitySet="subCategory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MAINCATEGORYROLE" Association="Self.FK_MAINCATEGORYROLE">
+            <End Role="occupations" EntitySet="occupations" />
+            <End Role="mainCategory" EntitySet="mainCategory" />
+          </AssociationSet>
+          <AssociationSet Name="FK_OccupationId" Association="Self.FK_OccupationId">
+            <End Role="occupations" EntitySet="occupations" />
+            <End Role="users" EntitySet="users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SUBCATEGORYOCCUPATION" Association="Self.FK_SUBCATEGORYOCCUPATION">
+            <End Role="occupations" EntitySet="occupations" />
+            <End Role="subCategory" EntitySet="subCategory" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Karbantarto01_DBModelStoreContainer" CdmEntityContainer="Karbantarto01_DBEntities">
+          <EntitySetMapping Name="assets">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.assets">
+              <MappingFragment StoreEntitySet="assets">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="location" ColumnName="location" />
+                <ScalarProperty Name="assetsMainCategory" ColumnName="assetsMainCategory" />
+                <ScalarProperty Name="assetsSubCategory" ColumnName="assetsSubCategory" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="mainCategory">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.mainCategory">
+              <MappingFragment StoreEntitySet="mainCategory">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="mainCategoryName" ColumnName="mainCategoryName" />
+                <ScalarProperty Name="mainCategoryWorkMinutes" ColumnName="mainCategoryWorkMinutes" />
+                <ScalarProperty Name="mainCategoryOccupation" ColumnName="mainCategoryOccupation" />
+                <ScalarProperty Name="mainCategoryOpId" ColumnName="mainCategoryOpId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="occupations">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.occupations">
+              <MappingFragment StoreEntitySet="occupations">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="occupationName" ColumnName="occupationName" />
+                <ScalarProperty Name="occupationDescrition" ColumnName="occupationDescrition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="operations">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.operations">
+              <MappingFragment StoreEntitySet="operations">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="opId" ColumnName="opId" />
+                <ScalarProperty Name="opName" ColumnName="opName" />
+                <ScalarProperty Name="opWorkMinutes" ColumnName="opWorkMinutes" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="roles">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.roles">
+              <MappingFragment StoreEntitySet="roles">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="roleName" ColumnName="roleName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="subCategory">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.subCategory">
+              <MappingFragment StoreEntitySet="subCategory">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="subCategoryName" ColumnName="subCategoryName" />
+                <ScalarProperty Name="subCategoryLevel" ColumnName="subCategoryLevel" />
+                <ScalarProperty Name="subMainId" ColumnName="subMainId" />
+                <ScalarProperty Name="subCategoryWorkMinutes" ColumnName="subCategoryWorkMinutes" />
+                <ScalarProperty Name="subCategoryOccupation" ColumnName="subCategoryOccupation" />
+                <ScalarProperty Name="subCategoryOpId" ColumnName="subCategoryOpId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="Karbantarto01_DBModel.users">
+              <MappingFragment StoreEntitySet="users">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="fullName" ColumnName="fullName" />
+                <ScalarProperty Name="roleId" ColumnName="roleId" />
+                <ScalarProperty Name="occupationId" ColumnName="occupationId" />
+                <ScalarProperty Name="token" ColumnName="token" />
+                <ScalarProperty Name="password" ColumnName="password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
