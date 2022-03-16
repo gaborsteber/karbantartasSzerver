@@ -228,8 +228,8 @@
           <NavigationProperty Name="occupations" Relationship="Self.FK_OccupationId" FromRole="users" ToRole="occupations" />
         </EntityType>
         <Association Name="FK_MAINCATEGORY">
-          <End Role="mainCategory" Type="Self.mainCategory" Multiplicity="1" />
-          <End Role="subCategory" Type="Self.subCategory" Multiplicity="*" />
+          <End Type="Self.mainCategory" Multiplicity="1" Role="mainCategory" />
+          <End Type="Self.subCategory" Multiplicity="*" Role="subCategory" />
           <ReferentialConstraint>
             <Principal Role="mainCategory">
               <PropertyRef Name="id" />
@@ -240,8 +240,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_MAINCATEGORYROLE">
-          <End Role="occupations" Type="Self.occupations" Multiplicity="1" />
-          <End Role="mainCategory" Type="Self.mainCategory" Multiplicity="*" />
+          <End Type="Self.occupations" Multiplicity="1" Role="occupations" />
+          <End Type="Self.mainCategory" Multiplicity="*" Role="mainCategory" />
           <ReferentialConstraint>
             <Principal Role="occupations">
               <PropertyRef Name="id" />
@@ -252,8 +252,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_OccupationId">
-          <End Role="occupations" Type="Self.occupations" Multiplicity="0..1" />
-          <End Role="users" Type="Self.users" Multiplicity="*" />
+          <End Type="Self.occupations" Multiplicity="0..1" Role="occupations" />
+          <End Type="Self.users" Multiplicity="*" Role="users" />
           <ReferentialConstraint>
             <Principal Role="occupations">
               <PropertyRef Name="id" />
@@ -264,8 +264,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_SUBCATEGORYOCCUPATION">
-          <End Role="occupations" Type="Self.occupations" Multiplicity="1" />
-          <End Role="subCategory" Type="Self.subCategory" Multiplicity="*" />
+          <End Type="Self.occupations" Multiplicity="1" Role="occupations" />
+          <End Type="Self.subCategory" Multiplicity="*" Role="subCategory" />
           <ReferentialConstraint>
             <Principal Role="occupations">
               <PropertyRef Name="id" />
@@ -284,20 +284,20 @@
           <EntitySet Name="subCategory" EntityType="Self.subCategory" />
           <EntitySet Name="users" EntityType="Self.users" />
           <AssociationSet Name="FK_MAINCATEGORY" Association="Self.FK_MAINCATEGORY">
-            <End Role="mainCategory" EntitySet="mainCategory" />
-            <End Role="subCategory" EntitySet="subCategory" />
+            <End EntitySet="mainCategory" Role="mainCategory" />
+            <End EntitySet="subCategory" Role="subCategory" />
           </AssociationSet>
           <AssociationSet Name="FK_MAINCATEGORYROLE" Association="Self.FK_MAINCATEGORYROLE">
-            <End Role="occupations" EntitySet="occupations" />
-            <End Role="mainCategory" EntitySet="mainCategory" />
+            <End EntitySet="occupations" Role="occupations" />
+            <End EntitySet="mainCategory" Role="mainCategory" />
           </AssociationSet>
           <AssociationSet Name="FK_OccupationId" Association="Self.FK_OccupationId">
-            <End Role="occupations" EntitySet="occupations" />
-            <End Role="users" EntitySet="users" />
+            <End EntitySet="occupations" Role="occupations" />
+            <End EntitySet="users" Role="users" />
           </AssociationSet>
           <AssociationSet Name="FK_SUBCATEGORYOCCUPATION" Association="Self.FK_SUBCATEGORYOCCUPATION">
-            <End Role="occupations" EntitySet="occupations" />
-            <End Role="subCategory" EntitySet="subCategory" />
+            <End EntitySet="occupations" Role="occupations" />
+            <End EntitySet="subCategory" Role="subCategory" />
           </AssociationSet>
         </EntityContainer>
       </Schema>

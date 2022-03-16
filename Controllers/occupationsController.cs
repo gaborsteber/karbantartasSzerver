@@ -18,101 +18,128 @@ namespace karbantartasSzerver.Controllers
         private Karbantarto01_DBEntities db = new Karbantarto01_DBEntities();
 
         // GET: api/occupations
-        /*public IQueryable<occupations> Getoccupations()
+        public IQueryable<occupations> Getoccupations()
         {
             return db.occupations;
-        }*/
-        [ResponseType(typeof(occupations))]
+        }
+        /*[ResponseType(typeof(occupations))]
         public IHttpActionResult Getoccupations()
         {
             var re = Request;
             var headers = re.Headers;
-
-            //System.Diagnostics.Debug.WriteLine("kapott header id: " + headers.GetValues("userId").First());
-            //System.Diagnostics.Debug.WriteLine("kapott header token: " + headers.GetValues("token").First());
-            
-            int userId = Int32.Parse(headers.GetValues("userId").First());
-            
+            int userId = Int32.Parse(headers.GetValues("userId").First());         
             IEnumerable<users> usersfromdb = db.users;
-            IEnumerable<occupations> occfromdb = db.occupations;
-                
+            IEnumerable<occupations> occfromdb = db.occupations;        
             users user = db.users.Find(userId);
-                bool authOK = false;
+            bool authOK = false;
 
-                if (headers.GetValues("token").First() == (user.token))
-                {
-                    authOK = true;
-                    System.Diagnostics.Debug.WriteLine(authOK);
-                }
-
-                if (authOK)
-                {
-                    return Ok(occfromdb);
-                }
-                else return Unauthorized();
-            
-        }
-            // GET: api/occupations/5
-            [ResponseType(typeof(occupations))]
-        public IHttpActionResult Getoccupations(int id)
-        {
-            occupations occupations = db.occupations.Find(id);
-            if (occupations == null)
+            if (headers.GetValues("token").First() == (user.token))
             {
-                return NotFound();
+                authOK = true;
+                System.Diagnostics.Debug.WriteLine(authOK);
             }
 
-            return Ok(occupations);
+            if (authOK)
+            {
+                return Ok(occfromdb);
+            }
+            else return Unauthorized();
+            
+        }
+        */
+        // GET: api/occupations/5
+        [ResponseType(typeof(occupations))]
+        public IHttpActionResult Getoccupations(int id)
+        {
+            var re = Request;
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            IEnumerable<users> usersfromdb = db.users;
+            IEnumerable<occupations> occfromdb = db.occupations;
+            users user = db.users.Find(userId);
+            if (headers.GetValues("token").First() == (user.token))
+            {
+                occupations occupations = db.occupations.Find(id);
+                if (occupations == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(occupations);
+            }
+            else return Unauthorized();
         }
 
         // PUT: api/occupations/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putoccupations(int id, occupations occupations)
         {
-            if (!ModelState.IsValid)
+            var re = Request;
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            IEnumerable<users> usersfromdb = db.users;
+            IEnumerable<occupations> occfromdb = db.occupations;
+            users user = db.users.Find(userId);
+            
+            if (headers.GetValues("token").First() == (user.token))
             {
-                return BadRequest(ModelState);
-            }
-
-            if (id != occupations.id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(occupations).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!occupationsExists(id))
+                if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    return BadRequest(ModelState);
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return StatusCode(HttpStatusCode.NoContent);
+                if (id != occupations.id)
+                {
+                    return BadRequest();
+                }
+
+                db.Entry(occupations).State = EntityState.Modified;
+
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!occupationsExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            else return Unauthorized();
         }
 
         // POST: api/occupations
         [ResponseType(typeof(occupations))]
         public IHttpActionResult Postoccupations(occupations occupations)
         {
-            if (!ModelState.IsValid)
+            var re = Request;
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            IEnumerable<users> usersfromdb = db.users;
+            IEnumerable<occupations> occfromdb = db.occupations;
+            users user = db.users.Find(userId);
+
+            if (headers.GetValues("token").First() == (user.token))
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                db.occupations.Add(occupations);
+                db.SaveChanges();
+
+                return CreatedAtRoute("DefaultApi", new { id = occupations.id }, occupations);
             }
-
-            db.occupations.Add(occupations);
-            db.SaveChanges();
-
-            return CreatedAtRoute("DefaultApi", new { id = occupations.id }, occupations);
+            else return Unauthorized();
         }
 
         // DELETE: api/occupations/5

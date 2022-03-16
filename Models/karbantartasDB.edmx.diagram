@@ -11,11 +11,11 @@
         <EntityTypeShape EntityType="Karbantarto01_DBModel.operations" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Karbantarto01_DBModel.roles" Width="1.5" PointX="0.75" PointY="7.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Karbantarto01_DBModel.subCategory" Width="1.5" PointX="5.25" PointY="1.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="Karbantarto01_DBModel.users" Width="1.5" PointX="3" PointY="4.375" IsExpanded="true" />
-        <AssociationConnector Association="Karbantarto01_DBModel.FK_MAINCATEGORY" ManuallyRouted="false" />
-        <AssociationConnector Association="Karbantarto01_DBModel.FK_MAINCATEGORYROLE" ManuallyRouted="false" />
-        <AssociationConnector Association="Karbantarto01_DBModel.FK_OccupationId" ManuallyRouted="false" />
-        <AssociationConnector Association="Karbantarto01_DBModel.FK_SUBCATEGORYOCCUPATION" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="Karbantarto01_DBModel.users" Width="1.5" PointX="3" PointY="4.875" IsExpanded="true" />
+        <AssociationConnector ManuallyRouted="false" Association="Karbantarto01_DBModel.FK_MAINCATEGORY" />
+        <AssociationConnector ManuallyRouted="false" Association="Karbantarto01_DBModel.FK_MAINCATEGORYROLE" />
+        <AssociationConnector ManuallyRouted="false" Association="Karbantarto01_DBModel.FK_OccupationId" />
+        <AssociationConnector ManuallyRouted="false" Association="Karbantarto01_DBModel.FK_SUBCATEGORYOCCUPATION" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
