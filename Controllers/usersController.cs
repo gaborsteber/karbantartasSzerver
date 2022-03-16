@@ -92,11 +92,12 @@ namespace karbantartasSzerver.Controllers
                                         
                     TokenToDb(usersfromdb.ElementAt<users>(i).id, usersfromdb.ElementAt<users>(i));
                 }
+               // else user.Add("token", "false");
             }
             return user;        //JSON megy vissza a válaszban, a fenti user felépítésben.
         }
         
-        // PUT: api/users/5
+       // PUT: api/users/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putusers(int id, users users)
         {            
