@@ -22,7 +22,8 @@ namespace karbantartasSzerver.Controllers
         {
             return db.users;
         }*/
-
+        
+        // GET: api/users
         [ResponseType(typeof(users))]
         public IHttpActionResult Getusers()
         {
@@ -100,7 +101,7 @@ namespace karbantartasSzerver.Controllers
        // PUT: api/users/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putusers(int id, users users)
-        {            
+        {
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
@@ -110,9 +111,21 @@ namespace karbantartasSzerver.Controllers
                 {
                     return BadRequest();
                 }
-
+                                
                 db.Entry(users).State = EntityState.Modified;
-
+                
+                /*var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+                var headers = re.Headers;
+                int userId = Int32.Parse(headers.GetValues("userId").First());
+                bool authOk = false;
+                if (headers.GetValues("token").First() == (db.users.Find(userId).token))
+                {
+                    authOk = true;
+                    System.Diagnostics.Debug.WriteLine("azonositas: " + authOk);
+                }
+                //else return Unauthorized();
+                if (authOk)
+                {*/
                 try
                 {
                     db.SaveChanges();
@@ -129,7 +142,9 @@ namespace karbantartasSzerver.Controllers
                     }
                 }
                 return StatusCode(HttpStatusCode.NoContent);
-            }
+            /*}
+            else return Unauthorized();*/
+        }
             
            
 
@@ -169,15 +184,28 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(users))]
         public IHttpActionResult Postusers(users users)
         {
-            if (!ModelState.IsValid)
+            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            bool authOk = false;
+            if (headers.GetValues("token").First() == (db.users.Find(userId).token))
             {
-                return BadRequest(ModelState);
+                authOk = true;
+                System.Diagnostics.Debug.WriteLine("azonositas: " + authOk);
             }
+            if (authOk)
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            db.users.Add(users);
-            db.SaveChanges();
+                db.users.Add(users);
+                db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = users.id }, users);
+                return CreatedAtRoute("DefaultApi", new { id = users.id }, users);
+            }
+            else return Unauthorized();
         }
 
         // DELETE: api/users/5
