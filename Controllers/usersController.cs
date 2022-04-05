@@ -18,15 +18,11 @@ namespace karbantartasSzerver.Controllers
         private Karbantarto01_DBEntities db = new Karbantarto01_DBEntities();
 
         // GET: api/users
-        /*public IQueryable<users> Getusers()
-        {
-            return db.users;
-        }*/
-        
-        // GET: api/users
         [ResponseType(typeof(users))]
         public IHttpActionResult Getusers()
         {
+            try
+            {
             var re = Request;
             var headers = re.Headers;
             int userId = Int32.Parse(headers.GetValues("userId").First());      //System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).id); System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).token);
@@ -44,18 +40,25 @@ namespace karbantartasSzerver.Controllers
                 return Ok(usersfromdb);
             }
             else return Unauthorized();
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized();
+            }
         }
   
         // GET: api/users/5
         [ResponseType(typeof(users))]
         public IHttpActionResult Getusers(int id)
         {
-            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());
+            try
+            {  
+                var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+                var headers = re.Headers;
+                int userId = Int32.Parse(headers.GetValues("userId").First());             
+           
             IEnumerable<users> usersfromdb = db.users;
             users user = db.users.Find(userId);
-            
             if (headers.GetValues("token").First() == (user.token))
             {
                 users users = db.users.Find(id);
@@ -66,7 +69,12 @@ namespace karbantartasSzerver.Controllers
                 return Ok(users);
             }
             else return Unauthorized();
-        }
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized();
+            }
+}
         public JObject Getusers(string luname, string lpass)
         {
             IEnumerable<users> usersfromdb = db.users;
@@ -184,6 +192,8 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(users))]
         public IHttpActionResult Postusers(users users)
         {
+            try
+            {
             var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
             var headers = re.Headers;
             int userId = Int32.Parse(headers.GetValues("userId").First());
@@ -206,22 +216,50 @@ namespace karbantartasSzerver.Controllers
                 return CreatedAtRoute("DefaultApi", new { id = users.id }, users);
             }
             else return Unauthorized();
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized();
+            }
         }
 
         // DELETE: api/users/5
         [ResponseType(typeof(users))]
         public IHttpActionResult Deleteusers(int id)
         {
-            users users = db.users.Find(id);
-            if (users == null)
+            /*try
             {
-                return NotFound();
+                var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+                var headers = re.Headers;
+                int userId = Int32.Parse(headers.GetValues("userId").First());
+                bool authOk = false;
+                if (headers.GetValues("token").First() == (db.users.Find(userId).token))
+                {
+                    authOk = true;
+                    System.Diagnostics.Debug.WriteLine("azonositas: " + authOk);
+                }
+                if (authOk)
+                {*/
+                    //System.Diagnostics.Debug.WriteLine("Az auth ok");
+                    users users = db.users.Find(id);
+                    
+                    if (users == null)
+                    {
+                        return NotFound();
+                    }
+
+                    db.users.Remove(users);
+                    //System.Diagnostics.Debug.WriteLine("törlés");
+                    db.SaveChanges();
+
+                    return Ok(users);
+                /*}
+                else return Unauthorized();
             }
-
-            db.users.Remove(users);
-            db.SaveChanges();
-
-            return Ok(users);
+            catch (Exception ex)
+            {
+                return Unauthorized();
+            }*/
         }
 
         protected override void Dispose(bool disposing)
