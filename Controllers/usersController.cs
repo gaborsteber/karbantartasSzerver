@@ -21,45 +21,20 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(users))]
         public IHttpActionResult Getusers()
         {
-            try
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());      //System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).id); System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).token);
-            IEnumerable<users> usersfromdb = db.users;
-            users user = db.users.Find(userId);
-            bool authOK = false;
-
-            if (headers.GetValues("token").First() == (user.token))     
-            {
-                authOK = true;      //System.Diagnostics.Debug.WriteLine(authOK);
-            }
-
-            if (authOK)
-            {
-                return Ok(usersfromdb);
+                return Ok(db.users);
             }
             else return Unauthorized();
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized();
-            }
         }
-  
+
         // GET: api/users/5
         [ResponseType(typeof(users))]
         public IHttpActionResult Getusers(int id)
         {
-            try
-            {  
-                var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
-                var headers = re.Headers;
-                int userId = Int32.Parse(headers.GetValues("userId").First());             
-           
-            IEnumerable<users> usersfromdb = db.users;
-            users user = db.users.Find(userId);
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
                 users users = db.users.Find(id);
                 if (users == null)
@@ -69,12 +44,8 @@ namespace karbantartasSzerver.Controllers
                 return Ok(users);
             }
             else return Unauthorized();
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized();
-            }
-}
+
+        }
         public JObject Getusers(string luname, string lpass)
         {
             IEnumerable<users> usersfromdb = db.users;
@@ -86,7 +57,7 @@ namespace karbantartasSzerver.Controllers
                     var allChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
                     var random = new Random();
                     var resultToken = new string(
-                    
+
                     Enumerable.Repeat(allChar, 24)
                        .Select(token => token[random.Next(token.Length)]).ToArray());
                     usersfromdb.ElementAt<users>(i).token = resultToken;        //System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).token);        //System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).id);
@@ -98,18 +69,21 @@ namespace karbantartasSzerver.Controllers
                     user.Add("occupationId", usersfromdb.ElementAt<users>(i).occupationId);
                     user.Add("token", usersfromdb.ElementAt<users>(i).token);
                     user.Add("password", usersfromdb.ElementAt<users>(i).password);
-                                        
+
                     TokenToDb(usersfromdb.ElementAt<users>(i).id, usersfromdb.ElementAt<users>(i));
                 }
-               // else user.Add("token", "false");
+                // else user.Add("token", "false");
             }
             return user;        //JSON megy vissza a válaszban, a fenti user felépítésben.
         }
-        
-       // PUT: api/users/5
+
+        // PUT: api/users/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putusers(int id, users users)
         {
+            bool authStatus = validateUser();
+            if (authStatus)
+            {
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
@@ -119,21 +93,10 @@ namespace karbantartasSzerver.Controllers
                 {
                     return BadRequest();
                 }
-                                
+
                 db.Entry(users).State = EntityState.Modified;
-                
-                /*var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
-                var headers = re.Headers;
-                int userId = Int32.Parse(headers.GetValues("userId").First());
-                bool authOk = false;
-                if (headers.GetValues("token").First() == (db.users.Find(userId).token))
-                {
-                    authOk = true;
-                    System.Diagnostics.Debug.WriteLine("azonositas: " + authOk);
-                }
-                //else return Unauthorized();
-                if (authOk)
-                {*/
+
+
                 try
                 {
                     db.SaveChanges();
@@ -150,60 +113,50 @@ namespace karbantartasSzerver.Controllers
                     }
                 }
                 return StatusCode(HttpStatusCode.NoContent);
-            /*}
-            else return Unauthorized();*/
+            }
+            else return Unauthorized();
         }
-            
-           
+
+
 
         public IHttpActionResult TokenToDb(int id, users users)
         {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-                if (id != users.id)
-                {
-                    return BadRequest();
-                }
+            if (id != users.id)
+            {
+                return BadRequest();
+            }
 
-                db.Entry(users).State = EntityState.Modified;
+            db.Entry(users).State = EntityState.Modified;
 
-                try
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!usersExists(id))
                 {
-                    db.SaveChanges();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!usersExists(id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return StatusCode(HttpStatusCode.NoContent);
+            }
+            return StatusCode(HttpStatusCode.NoContent);
         }
 
         // POST: api/users
         [ResponseType(typeof(users))]
         public IHttpActionResult Postusers(users users)
         {
-            try
-            {
-            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());
-            bool authOk = false;
-            if (headers.GetValues("token").First() == (db.users.Find(userId).token))
-            {
-                authOk = true;
-                System.Diagnostics.Debug.WriteLine("azonositas: " + authOk);
-            }
-            if (authOk)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
                 if (!ModelState.IsValid)
                 {
@@ -216,51 +169,33 @@ namespace karbantartasSzerver.Controllers
                 return CreatedAtRoute("DefaultApi", new { id = users.id }, users);
             }
             else return Unauthorized();
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized();
-            }
         }
+       
 
         // DELETE: api/users/5
         [ResponseType(typeof(users))]
         public IHttpActionResult Deleteusers(int id)
         {
-            /*try
+
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
-                var headers = re.Headers;
-                int userId = Int32.Parse(headers.GetValues("userId").First());
-                bool authOk = false;
-                if (headers.GetValues("token").First() == (db.users.Find(userId).token))
+                users users = db.users.Find(id);
+
+                if (users == null)
                 {
-                    authOk = true;
-                    System.Diagnostics.Debug.WriteLine("azonositas: " + authOk);
+                    return NotFound();
                 }
-                if (authOk)
-                {*/
-                    //System.Diagnostics.Debug.WriteLine("Az auth ok");
-                    users users = db.users.Find(id);
-                    
-                    if (users == null)
-                    {
-                        return NotFound();
-                    }
 
-                    db.users.Remove(users);
-                    //System.Diagnostics.Debug.WriteLine("törlés");
-                    db.SaveChanges();
+                db.users.Remove(users);
+                //System.Diagnostics.Debug.WriteLine("törlés");
+                db.SaveChanges();
 
-                    return Ok(users);
-                /*}
-                else return Unauthorized();
+                return Ok(users);
             }
-            catch (Exception ex)
-            {
-                return Unauthorized();
-            }*/
+            else return Unauthorized();
         }
+
 
         protected override void Dispose(bool disposing)
         {
@@ -275,7 +210,21 @@ namespace karbantartasSzerver.Controllers
         {
             return db.users.Count(e => e.id == id) > 0;
         }
-
+        private bool validateUser()
+        {
+            bool authStatus = false;
+            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            System.Diagnostics.Debug.WriteLine("ez a header: " + headers.GetValues("token").First());
+            IEnumerable<users> usersfromdb = db.users;
+            users user = db.users.Find(userId);
+            if (headers.GetValues("token").First() == (user.token))
+            {
+                authStatus = true;
+            }
+                return authStatus;
+        }
        /* // PUT: api/users/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putusers3(int id, users users)

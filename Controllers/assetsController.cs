@@ -16,30 +16,14 @@ namespace karbantartasSzerver.Controllers
     {
         private Karbantarto01_DBEntities db = new Karbantarto01_DBEntities();
 
-        // GET: api/assets
-       /* public IQueryable<assets> Getassets()
-        {
-            return db.assets;
-        }*/
 
         [ResponseType(typeof(assets))]
         public IHttpActionResult Getassets()
         {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());      //System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).id); System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).token);
-            IEnumerable<users> usersfromdb = db.users;
-            users user = db.users.Find(userId);
-            bool authOK = false;
-
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                authOK = true;      //System.Diagnostics.Debug.WriteLine(authOK);
-            }
-
-            if (authOK)
-            {
-                return Ok(db.assets);
+               return Ok(db.assets);
             }
             else return Unauthorized();
         }
@@ -48,19 +32,84 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(assets))]
         public IHttpActionResult Getassets(int id)
         {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());      //System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).id); System.Diagnostics.Debug.WriteLine(usersfromdb.ElementAt<users>(i).token);
-            IEnumerable<users> usersfromdb = db.users;
-            users user = db.users.Find(userId);
-            bool authOK = false;
-
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                authOK = true;      //System.Diagnostics.Debug.WriteLine(authOK);
+                assets assets = db.assets.Find(id);
+                if (assets == null)
+                {
+                    return NotFound();
+                }
+                return Ok(assets);
             }
+            else return Unauthorized();
+        }
 
-            if (authOK)
+        // PUT: api/assets/5
+        [ResponseType(typeof(void))]
+        public IHttpActionResult Putassets(int id, assets assets)
+        {
+            bool authStatus = validateUser();
+            if (authStatus)
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                if (id != assets.id)
+                {
+                    return BadRequest();
+                }
+
+                db.Entry(assets).State = EntityState.Modified;
+
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!assetsExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            else return Unauthorized();
+        }
+
+        // POST: api/assets
+        [ResponseType(typeof(assets))]
+        public IHttpActionResult Postassets(assets assets)
+        {
+            bool authStatus = validateUser();
+            if (authStatus)
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                db.assets.Add(assets);
+                db.SaveChanges();
+
+                return CreatedAtRoute("DefaultApi", new { id = assets.id }, assets);
+            }
+            else return Unauthorized();
+        }
+
+        // DELETE: api/assets/5
+        [ResponseType(typeof(assets))]
+        public IHttpActionResult Deleteassets(int id)
+        {
+            bool authStatus = validateUser();
+            if (authStatus)
             {
                 assets assets = db.assets.Find(id);
                 if (assets == null)
@@ -68,75 +117,12 @@ namespace karbantartasSzerver.Controllers
                     return NotFound();
                 }
 
+                db.assets.Remove(assets);
+                db.SaveChanges();
+
                 return Ok(assets);
             }
-            return Unauthorized();
-        }
-
-        // PUT: api/assets/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult Putassets(int id, assets assets)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != assets.id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(assets).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!assetsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        // POST: api/assets
-        [ResponseType(typeof(assets))]
-        public IHttpActionResult Postassets(assets assets)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            db.assets.Add(assets);
-            db.SaveChanges();
-
-            return CreatedAtRoute("DefaultApi", new { id = assets.id }, assets);
-        }
-
-        // DELETE: api/assets/5
-        [ResponseType(typeof(assets))]
-        public IHttpActionResult Deleteassets(int id)
-        {
-            assets assets = db.assets.Find(id);
-            if (assets == null)
-            {
-                return NotFound();
-            }
-
-            db.assets.Remove(assets);
-            db.SaveChanges();
-
-            return Ok(assets);
+            else return Unauthorized();
         }
 
         protected override void Dispose(bool disposing)
@@ -151,6 +137,22 @@ namespace karbantartasSzerver.Controllers
         private bool assetsExists(int id)
         {
             return db.assets.Count(e => e.id == id) > 0;
+        }
+
+        private bool validateUser()
+        {
+            bool authStatus = false;
+            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            System.Diagnostics.Debug.WriteLine("ez a header: " + headers.GetValues("token").First());
+            IEnumerable<users> usersfromdb = db.users;
+            users user = db.users.Find(userId);
+            if (headers.GetValues("token").First() == (user.token))
+            {
+                authStatus = true;
+            }
+            return authStatus;
         }
     }
 }

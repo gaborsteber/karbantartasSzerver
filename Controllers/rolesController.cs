@@ -17,88 +17,114 @@ namespace karbantartasSzerver.Controllers
         private Karbantarto01_DBEntities db = new Karbantarto01_DBEntities();
 
         // GET: api/roles
-        public IQueryable<roles> Getroles()
+        [ResponseType(typeof(roles))]
+        public IHttpActionResult Getroles()
         {
-            return db.roles;
+            bool authStatus = validateUser();
+            if (authStatus)
+            {
+                return Ok(db.roles);
+            }
+            else return Unauthorized();
         }
 
         // GET: api/roles/5
         [ResponseType(typeof(roles))]
         public IHttpActionResult Getroles(int id)
         {
-            roles roles = db.roles.Find(id);
-            if (roles == null)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return NotFound();
-            }
+                roles roles = db.roles.Find(id);
+                if (roles == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(roles);
+                return Ok(roles);
+            }
+            else return Unauthorized();
         }
 
         // PUT: api/roles/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putroles(int id, roles roles)
         {
-            if (!ModelState.IsValid)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return BadRequest(ModelState);
-            }
-
-            if (id != roles.id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(roles).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!rolesExists(id))
+                if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    return BadRequest(ModelState);
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return StatusCode(HttpStatusCode.NoContent);
+                if (id != roles.id)
+                {
+                    return BadRequest();
+                }
+
+                db.Entry(roles).State = EntityState.Modified;
+
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!rolesExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            else return Unauthorized();
         }
 
         // POST: api/roles
         [ResponseType(typeof(roles))]
         public IHttpActionResult Postroles(roles roles)
         {
-            if (!ModelState.IsValid)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                db.roles.Add(roles);
+                db.SaveChanges();
+
+                return CreatedAtRoute("DefaultApi", new { id = roles.id }, roles);
             }
-
-            db.roles.Add(roles);
-            db.SaveChanges();
-
-            return CreatedAtRoute("DefaultApi", new { id = roles.id }, roles);
+            else return Unauthorized();
         }
 
         // DELETE: api/roles/5
         [ResponseType(typeof(roles))]
         public IHttpActionResult Deleteroles(int id)
         {
-            roles roles = db.roles.Find(id);
-            if (roles == null)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return NotFound();
+                roles roles = db.roles.Find(id);
+                if (roles == null)
+                {
+                    return NotFound();
+                }
+
+                db.roles.Remove(roles);
+                db.SaveChanges();
+
+                return Ok(roles);
             }
-
-            db.roles.Remove(roles);
-            db.SaveChanges();
-
-            return Ok(roles);
+            else return Unauthorized();
         }
 
         protected override void Dispose(bool disposing)
@@ -114,5 +140,22 @@ namespace karbantartasSzerver.Controllers
         {
             return db.roles.Count(e => e.id == id) > 0;
         }
+
+        private bool validateUser()
+        {
+            bool authStatus = false;
+            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            System.Diagnostics.Debug.WriteLine("ez a header: " + headers.GetValues("token").First());
+            IEnumerable<users> usersfromdb = db.users;
+            users user = db.users.Find(userId);
+            if (headers.GetValues("token").First() == (user.token))
+            {
+                authStatus = true;
+            }
+            return authStatus;
+        }
+
     }
 }

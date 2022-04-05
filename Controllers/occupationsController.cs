@@ -17,47 +17,25 @@ namespace karbantartasSzerver.Controllers
     {
         private Karbantarto01_DBEntities db = new Karbantarto01_DBEntities();
 
-        // GET: api/occupations
-        public IQueryable<occupations> Getoccupations()
-        {
-            return db.occupations;
-        }
-        /*[ResponseType(typeof(occupations))]
+
+        [ResponseType(typeof(occupations))]
         public IHttpActionResult Getoccupations()
         {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());         
-            IEnumerable<users> usersfromdb = db.users;
-            IEnumerable<occupations> occfromdb = db.occupations;        
-            users user = db.users.Find(userId);
-            bool authOK = false;
-
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                authOK = true;
-                System.Diagnostics.Debug.WriteLine(authOK);
-            }
-
-            if (authOK)
-            {
-                return Ok(occfromdb);
+                return Ok(db.occupations);
             }
             else return Unauthorized();
             
         }
-        */
+        
         // GET: api/occupations/5
         [ResponseType(typeof(occupations))]
         public IHttpActionResult Getoccupations(int id)
         {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());
-            IEnumerable<users> usersfromdb = db.users;
-            IEnumerable<occupations> occfromdb = db.occupations;
-            users user = db.users.Find(userId);
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
                 occupations occupations = db.occupations.Find(id);
                 if (occupations == null)
@@ -74,14 +52,8 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(void))]
         public IHttpActionResult Putoccupations(int id, occupations occupations)
         {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());
-            IEnumerable<users> usersfromdb = db.users;
-            IEnumerable<occupations> occfromdb = db.occupations;
-            users user = db.users.Find(userId);
-            
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
                 if (!ModelState.IsValid)
                 {
@@ -120,14 +92,8 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(occupations))]
         public IHttpActionResult Postoccupations(occupations occupations)
         {
-            var re = Request;
-            var headers = re.Headers;
-            int userId = Int32.Parse(headers.GetValues("userId").First());
-            IEnumerable<users> usersfromdb = db.users;
-            IEnumerable<occupations> occfromdb = db.occupations;
-            users user = db.users.Find(userId);
-
-            if (headers.GetValues("token").First() == (user.token))
+            bool authStatus = validateUser();
+            if (authStatus)
             {
                 if (!ModelState.IsValid)
                 {
@@ -146,16 +112,21 @@ namespace karbantartasSzerver.Controllers
         [ResponseType(typeof(occupations))]
         public IHttpActionResult Deleteoccupations(int id)
         {
-            occupations occupations = db.occupations.Find(id);
-            if (occupations == null)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return NotFound();
+                occupations occupations = db.occupations.Find(id);
+                if (occupations == null)
+                {
+                    return NotFound();
+                }
+
+                db.occupations.Remove(occupations);
+                db.SaveChanges();
+
+                return Ok(occupations);
             }
-
-            db.occupations.Remove(occupations);
-            db.SaveChanges();
-
-            return Ok(occupations);
+            else return Unauthorized();
         }
 
         protected override void Dispose(bool disposing)
@@ -171,5 +142,22 @@ namespace karbantartasSzerver.Controllers
         {
             return db.occupations.Count(e => e.id == id) > 0;
         }
+
+        private bool validateUser()
+        {
+            bool authStatus = false;
+            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            System.Diagnostics.Debug.WriteLine("ez a header: " + headers.GetValues("token").First());
+            IEnumerable<users> usersfromdb = db.users;
+            users user = db.users.Find(userId);
+            if (headers.GetValues("token").First() == (user.token))
+            {
+                authStatus = true;
+            }
+            return authStatus;
+        }
+
     }
 }

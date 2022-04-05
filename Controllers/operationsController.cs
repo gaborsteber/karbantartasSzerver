@@ -17,88 +17,114 @@ namespace karbantartasSzerver.Controllers
         private Karbantarto01_DBEntities db = new Karbantarto01_DBEntities();
 
         // GET: api/operations
-        public IQueryable<operations> Getoperations()
+        [ResponseType(typeof(operations))]
+        public IHttpActionResult Getoperations()
         {
-            return db.operations;
+            bool authStatus = validateUser();
+            if (authStatus)
+            {
+                return Ok(db.operations);
+            }
+            else return Unauthorized();
         }
 
         // GET: api/operations/5
         [ResponseType(typeof(operations))]
         public IHttpActionResult Getoperations(int id)
         {
-            operations operations = db.operations.Find(id);
-            if (operations == null)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return NotFound();
-            }
+                operations operations = db.operations.Find(id);
+                if (operations == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(operations);
+                return Ok(operations);
+            }
+            else return Unauthorized();
         }
 
         // PUT: api/operations/5
         [ResponseType(typeof(void))]
         public IHttpActionResult Putoperations(int id, operations operations)
         {
-            if (!ModelState.IsValid)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return BadRequest(ModelState);
-            }
-
-            if (id != operations.id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(operations).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!operationsExists(id))
+                if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    return BadRequest(ModelState);
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return StatusCode(HttpStatusCode.NoContent);
+                if (id != operations.id)
+                {
+                    return BadRequest();
+                }
+
+                db.Entry(operations).State = EntityState.Modified;
+
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!operationsExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            else return Unauthorized();
         }
 
         // POST: api/operations
         [ResponseType(typeof(operations))]
         public IHttpActionResult Postoperations(operations operations)
         {
-            if (!ModelState.IsValid)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                db.operations.Add(operations);
+                db.SaveChanges();
+
+                return CreatedAtRoute("DefaultApi", new { id = operations.id }, operations);
             }
-
-            db.operations.Add(operations);
-            db.SaveChanges();
-
-            return CreatedAtRoute("DefaultApi", new { id = operations.id }, operations);
+            else return Unauthorized();
         }
 
         // DELETE: api/operations/5
         [ResponseType(typeof(operations))]
         public IHttpActionResult Deleteoperations(int id)
         {
-            operations operations = db.operations.Find(id);
-            if (operations == null)
+            bool authStatus = validateUser();
+            if (authStatus)
             {
-                return NotFound();
+                operations operations = db.operations.Find(id);
+                if (operations == null)
+                {
+                    return NotFound();
+                }
+
+                db.operations.Remove(operations);
+                db.SaveChanges();
+
+                return Ok(operations);
             }
-
-            db.operations.Remove(operations);
-            db.SaveChanges();
-
-            return Ok(operations);
+            else return Unauthorized();
         }
 
         protected override void Dispose(bool disposing)
@@ -114,5 +140,22 @@ namespace karbantartasSzerver.Controllers
         {
             return db.operations.Count(e => e.id == id) > 0;
         }
+
+        private bool validateUser()
+        {
+            bool authStatus = false;
+            var re = Request;                                                       //System.Diagnostics.Debug.WriteLine(id);
+            var headers = re.Headers;
+            int userId = Int32.Parse(headers.GetValues("userId").First());
+            System.Diagnostics.Debug.WriteLine("ez a header: " + headers.GetValues("token").First());
+            IEnumerable<users> usersfromdb = db.users;
+            users user = db.users.Find(userId);
+            if (headers.GetValues("token").First() == (user.token))
+            {
+                authStatus = true;
+            }
+            return authStatus;
+        }
+
     }
 }
